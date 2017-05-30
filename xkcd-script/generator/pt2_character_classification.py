@@ -1,6 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import glob
 import os
 
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import parse
@@ -8,7 +12,7 @@ import parse
 
 pattern = 'stroke_x{x0:d}_y{y0:d}_x{x1:d}_y{y1:d}.png'
 strokes_by_bbox = {}
-for fname in glob.glob('../b80e3b3ab9edbda9ac4304f742cf292b/stroke*.png'):
+for fname in glob.glob('../generated/strokes/stroke*.png'):
     result = parse.parse(pattern, os.path.basename(fname))
     bbox = (result['x0'], result['y0'], result['x1'], result['y1'])
     img = (plt.imread(fname) * 255).astype(np.uint8)
@@ -18,6 +22,11 @@ for fname in glob.glob('../b80e3b3ab9edbda9ac4304f742cf292b/stroke*.png'):
 import scipy.cluster.vq
 
 n_lines = 11
+
+xs, ys = zip(*[[bbox[0], bbox[3]]
+                for bbox, img in strokes_by_bbox.items()])
+xs = np.array(xs, dtype=np.float)
+ys = np.array(ys, dtype=np.float)
 
 lines, _ = scipy.cluster.vq.kmeans(ys, n_lines, iter=1000)
 lines = np.array(sorted(lines))
@@ -93,6 +102,8 @@ for line_no, (character_line, glyph_line) in enumerate(zip(paragraphs, glyphs_by
 
 import skimage.io
 
+if not os.path.isdir('../generated/characters'):
+    os.makedirs('../generated/characters')
 
 replacements = {'/': 'forward-slash', '_': 'underscore'}
 
@@ -100,7 +111,9 @@ for line_no, line in enumerate(characters_by_line):
     for char_no, (char, bbox, img) in enumerate(line):
         char_repr = '-'.join(replacements.get(c, c) for c in char)
         hex_repr = '-'.join(str(hex(ord(c))) for c in char)
-        
-        fname = ('char_L{}_P{}_x{}_y{}_x{}_y{}_{char_repr}_{hex_repr}.ppm'
-                 ''.format(line_no, char_no, *bbox, char_repr=char_repr, hex_repr=hex_repr))
+        b64_repr = char.encode('base64')
+
+        fname = ('char_L{}_P{}_x{}_y{}_x{}_y{}_{b64_repr}.ppm'
+                 ''.format(line_no, char_no, *bbox, b64_repr=b64_repr))
+        fname = os.path.join('../generated/characters', fname)
         skimage.io.imsave(fname, img)

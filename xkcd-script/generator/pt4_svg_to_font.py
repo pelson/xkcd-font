@@ -1,49 +1,21 @@
-import subprocess
+# -*- coding: utf-8 -*-
 from __future__ import division
-
-
-def potrace(input_fname, output_fname):
-    subprocess.check_call(['potrace', '-s', input_fname, '-o', output_fname])
-
-
-import os
-import glob
-
-for fname in glob.glob('/char_*.ppm'):
-    new_name = os.path.splitext(os.path.basename(fname))[0] + '.svg'
-    potrace(fname, new_name)
-
-
-
+import fontforge
 import os
 import glob
 import parse
 
-fnames = glob.glob('char_*.svg')
+fnames = glob.glob('../generated/characters/char_*.svg')
 
 characters = []
 for fname in fnames:
-    # Sample filename: char_L2_P2_x378_y1471_x766_y1734_a-s_0x61-0x73.svg
+    # Sample filename: char_L2_P2_x378_y1471_x766_y1734_RQ==?.svg
     
-    pattern = 'char_L{line:d}_P{position:d}_x{x0:d}_y{y0:d}_x{x1:d}_y{y1:d}_{char}_{hex_repr}.svg'
+    pattern = 'char_L{line:d}_P{position:d}_x{x0:d}_y{y0:d}_x{x1:d}_y{y1:d}_{b64_str}.svg'
     result = parse.parse(pattern, os.path.basename(fname))
-    
-    # Split the hex representation by the "-" separator and convert to unicode ordinals.
-    ords = [int(hex_char, 16) for hex_char in result['hex_repr'].split('-')]
-    
-    # Now, where possible, generate character glyphs.
-    # In python 3.5+ this would be so much more pleasant.
-    chars = tuple(unichr(ordinal) if ordinal < 65536 else ordinal
-                  for ordinal in ords)
-
-    # Let's deal with that second I variant that has the two crosses - typically used for I as a
-    # pronoun.
-    if len(chars) > 1 and ''.join(chars) == 'I-pronoun':
-        chars = tuple(' I ')
-
+    chars = tuple(result['b64_str'].decode('base64').decode('utf-8'))
     bbox = (result['x0'], result['y0'], result['x1'], result['y1'])
     characters.append([result['line'], result['position'], bbox, fname, chars])
-
 
 
 def basic_font():
@@ -107,7 +79,6 @@ def create_char(font, chars, fname):
         # Multiple characters - this is a ligature. We need to register this in the
         # ligature lookup table we created. Not all font-handling libraries will do anything
         # with ligatures (e.g. matplotlib doesn't at vn <=2)
-
         ligature_name = '_'.join(chars)
         ligature_tuple = tuple([character.encode('ascii') for character in chars])
         
@@ -301,8 +272,9 @@ for line, position, bbox, fname, chars in characters:
     c.round()
 
 autokern(font)
+font_fname = '../font/xkcd-script.ttf'
 
+if os.path.exists(font_fname):
+    os.remove(font_fname)
 font.generate(font_fname)
-
-
 

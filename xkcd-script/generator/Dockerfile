@@ -27,3 +27,7 @@ RUN cd fontforge && \
  && make && make install
 
 RUN conda install -y -c conda-forge scikit-image nomkl
+RUN conda install -y -c conda-forge parse
+
+RUN conda install -y -c kalefranz imagemagick
+#RUN apt-get install imagemagick -y --force
