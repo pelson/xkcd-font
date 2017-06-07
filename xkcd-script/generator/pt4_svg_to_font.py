@@ -5,7 +5,7 @@ import os
 import glob
 import parse
 
-fnames = glob.glob('../generated/characters/char_*.svg')
+fnames = sorted(glob.glob('../generated/characters/char_*.svg'))
 
 characters = []
 for fname in fnames:
@@ -37,7 +37,7 @@ def basic_font():
                                                        [[b'latn',
                                                          [b'dflt']]]]])
     font.addLookupSubtable('ligatures', 'liga')
-    
+   
     return font
 
 
@@ -96,26 +96,8 @@ def create_char(font, chars, fname):
     return c
 
 
-font = basic_font()
-
-visited = []
-for line, position, bbox, fname, chars in characters:
-    if chars in visited:
-        # We have already seen this set of chars. For now, I do nothing
-        # with duplicates.
-        continue
-    visited.append(chars)
-    
-    c = create_char(font, chars, fname)
-
-
-
-
-
-font.generate('xkcd.woff')
-
 baseline_chars = ['a' 'e', 'm', 'A', 'E', 'M', '&', '@', '.', u'≪', u'É']
-caps_chars = ['M', 'A', 'E', 'k', 't', 'l', 'b', 'd', '1', '2', u'3', u'≪', '?', '!']
+caps_chars = ['S', 'T', 'J', 'k', 't', 'l', 'b', 'd', '1', '2', u'3', u'≪', '?', '!']
 
 line_stats = {}
 for line, position, bbox, fname, chars in characters:
@@ -228,9 +210,10 @@ def autokern(font):
 
     font.autoKern('kern', 60, ['r', 's'], lower, minKern=50)
     font.autoKern('kern', 100, ['f'], lower, minKern=50)
+    font.autoKern('kern', 60, lower, ['g'], minKern=50)
     font.autoKern('kern', 180, all_chars, ['j'], minKern=35)
     
-    font.autoKern('kern', 150, ['T', 'F'], all_chars)
+    font.autoKern('kern', 150, ['T', 'F', 'J'], all_chars)
     font.autoKern('kern', 30, ['C'], all_chars)
 
 
@@ -243,7 +226,8 @@ special_choices = {('C', ): dict(line=4),
                    # Get rid of the "as" ligature - it's not very good.
                    ('a', 's'): dict(line=None),
                    # A nice tall I.
-                   ('I', ): dict(line=4)}
+                   ('I', ): dict(line=4),
+                   }
 
 for line, position, bbox, fname, chars in characters:
     if chars in special_choices:
@@ -271,9 +255,14 @@ for line, position, bbox, fname, chars in characters:
     c.simplify()
     c.round()
 
+c = font.createMappedChar(32)
+c.width = 256
+
 autokern(font)
 font_fname = '../font/xkcd-script.ttf'
 
+if not os.path.exists(os.path.dirname(font_fname)):
+    os.makedirs(os.path.dirname(font_fname))
 if os.path.exists(font_fname):
     os.remove(font_fname)
 font.generate(font_fname)
