@@ -1,6 +1,7 @@
 # xkcd-font
 
-
+![FOOBAR](https://delme-readme-proxy.herokuapp.com/foo.png)
+[FOOBAR](https://delme-readme-proxy.herokuapp.com/)
 
 ## xkcd-script
 

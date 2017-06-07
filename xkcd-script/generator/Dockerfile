@@ -1,6 +1,14 @@
 FROM continuumio/miniconda
 
+# PLEASE NOTE: I, pelson, tried my best to refine this Dockerfile but was unable to build fontforge without it SegFaulting upon
+# python -c "import fontforge; fontforge.font()". At the time of writing, I've decided that whilst it is entirely necessary to resolve this,
+# I'm unable to put the necessary time to do so. For the time-being, I will simply document this fact, and make the working build available
+# on docker hub.
+
+
 MAINTAINER IPython Project <ipython-dev@python.org>
+# MAINTAINER Phil Elson <pelson.pub@gmail.com>
+
 
 RUN conda install -y -c conda-forge \
         harfbuzz cairo freetype pkg-config \
@@ -30,4 +38,3 @@ RUN conda install -y -c conda-forge scikit-image nomkl
 RUN conda install -y -c conda-forge parse
 
 RUN conda install -y -c kalefranz imagemagick
-#RUN apt-get install imagemagick -y --force

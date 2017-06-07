@@ -254,4 +254,3 @@ if not os.path.exists(strokes_dir):
 for bbox, img_array in merged_bbox_to_stroke_img.items():
     fname = '../generated/strokes/stroke_x{1}_y{0}_x{3}_y{2}.png'.format(*bbox)
     skimage.io.imsave(fname, img_array)
-    print('Saved {}'.format(fname))

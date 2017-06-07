@@ -1,0 +1,12 @@
+machine:
+  services:
+    - docker
+
+test:
+  override:
+    - xkcd-script/generator/run.sh
+
+    # Move the artifacts into the CIRCLE_ARTIFACTS directory. 
+    - mkdir -p $CIRCLE_ARTIFACTS/xkcd-script/samples $CIRCLE_ARTIFACTS/xkcd-script/font
+    - mv xkcd-script/samples/*.png $CIRCLE_ARTIFACTS/xkcd-script/
+    - mv xkcd-script/font/* $CIRCLE_ARTIFACTS/xkcd-script/font/

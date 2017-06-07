@@ -79,8 +79,10 @@ def create_char(font, chars, fname):
         # Multiple characters - this is a ligature. We need to register this in the
         # ligature lookup table we created. Not all font-handling libraries will do anything
         # with ligatures (e.g. matplotlib doesn't at vn <=2)
-        ligature_name = '_'.join(chars)
+        char_names = [charname(char) for char in chars]
+        ligature_name = '_'.join(char_names)
         ligature_tuple = tuple([character.encode('ascii') for character in chars])
+        ligature_tuple = tuple([character for character in char_names])
         
         c = font.createChar(-1, ligature_name)
 
@@ -187,12 +189,18 @@ def translate_glyph(c, char_bbox, cap_height, baseline):
     c.transform(t)
 
 
+def charname(char):
+    # Give the fontforge name for the given character.
+    return fontforge.nameFromUnicode(ord(char))
+
+
 def autokern(font):
     # Let fontforge do some magic and figure out automatic kerning for groups of glyphs.
 
     all_glyphs = [glyph.glyphname for glyph in font.glyphs()
                   if not glyph.glyphname.startswith(' ')]    
 
+    print('\n'.join(sorted(all_glyphs)))
     ligatures = [name for name in all_glyphs if '_' in name]
     upper_ligatures = [ligature for ligature in ligatures if ligature.upper() == ligature]
     lower_ligatures = [ligature for ligature in ligatures if ligature.lower() == ligature]
@@ -206,7 +214,7 @@ def autokern(font):
     font.addLookupSubtable('kerning', 'kern')
     
     # Everyone knows that two slashes together need kerning... (even if they didn't realise it)
-    font.autoKern('kern', 150, ['slash', 'backslash'], ['slash', 'backslash'])
+    font.autoKern('kern', 150, [charname('/'), charname('\\')], [charname('/'), charname('\\')])
 
     font.autoKern('kern', 60, ['r', 's'], lower, minKern=50)
     font.autoKern('kern', 100, ['f'], lower, minKern=50)
@@ -228,6 +236,11 @@ special_choices = {('C', ): dict(line=4),
                    # A nice tall I.
                    ('I', ): dict(line=4),
                    }
+
+# Special case - add a vertial pipe by re-using an I, and stretching it a bit.
+for line, position, bbox, fname, chars in characters:
+    if chars == (u'I',) and line == 4:
+        characters.append([4, None, bbox, fname, ('|',)])
 
 for line, position, bbox, fname, chars in characters:
     if chars in special_choices:
