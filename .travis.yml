@@ -13,9 +13,12 @@ before_install:
 - docker pull pelson/fontbuilder
 
 script:
-- set -e -x
+- set -e
 - if [[ "$(git --no-pager show -s --format='%cn' HEAD)" != "Doctr (Travis CI)" ]] ; then
-    xkcd-script/generator/run.sh;
-    xkcd-script/samples/preview.sh;
+    echo "Generating font" && \
+    xkcd-script/generator/run.sh && \
+    echo "Generating samples" && \
+    xkcd-script/samples/preview.sh && \
+    echo "Pushing back to repo" && \
     .github/commit-and-push-from-travis.sh;
   fi

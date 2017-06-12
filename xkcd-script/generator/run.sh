@@ -10,3 +10,4 @@ $RUN_CTXT python pt1_character_extraction.py
 $RUN_CTXT python pt2_character_classification.py
 $RUN_CTXT python pt3_ppm_to_svg.py
 $RUN_CTXT python pt4_svg_to_font.py
+$RUN_CTXT python pt5_gen_reprod_font.py 
