@@ -200,7 +200,7 @@ def autokern(font):
     all_glyphs = [glyph.glyphname for glyph in font.glyphs()
                   if not glyph.glyphname.startswith(' ')]    
 
-    print('\n'.join(sorted(all_glyphs)))
+    #print('\n'.join(sorted(all_glyphs)))
     ligatures = [name for name in all_glyphs if '_' in name]
     upper_ligatures = [ligature for ligature in ligatures if ligature.upper() == ligature]
     lower_ligatures = [ligature for ligature in ligatures if ligature.lower() == ligature]
@@ -272,7 +272,7 @@ c = font.createMappedChar(32)
 c.width = 256
 
 autokern(font)
-font_fname = '../font/xkcd-script.ttf'
+font_fname = '../font/xkcd-script.sfd'
 
 if not os.path.exists(os.path.dirname(font_fname)):
     os.makedirs(os.path.dirname(font_fname))
