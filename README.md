@@ -23,8 +23,9 @@ script font.
 
 A font that was created originally by Randall, and was used on [xkcd "The Pace of Modern Life" (April 1st, 2013)](https://xkcd.com/1227/).
 
-[Read more...](xkcd-uniform/README.md)
+![Sample of xkcd](xkcd/samples/ipsum.png)
 
+[Read more...](xkcd-uniform/README.md)
 
 ## License
 
