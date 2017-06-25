@@ -1,0 +1,15 @@
+# Font changes
+
+Please see the respective font READMEs ([xkcd-script](xkcd-script/README.md) &
+[xkcd](xkcd/README.md)) for guidance on how to contribute a change to a font.
+
+
+## Continuous integration
+
+This repository makes use of TravisCI to automatically build and push any
+changes back into the respective build directories. This means that technically
+you may make a change to the font input (e.g. code/template/image) without
+needing to make a change to the built fonts. In order for this to work, we have
+been careful to ensure that the built fonts are deterministic (that is, they
+produce *exactly* the same file each time they are re-built) - it is important
+that this property is preserved with each change.
