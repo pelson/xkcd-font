@@ -1,0 +1,26 @@
+name: Font preview link
+
+on:
+  pull_request_target:
+    branches: [master]
+
+jobs:
+  preview-link:
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.payload.pull_request.head.sha;
+            const { owner, repo } = context.repo;
+            const fontUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${sha}/xkcd-script/font/xkcd-script.woff`;
+            const previewUrl = `https://ipython.org/xkcd-font/preview.html?font=${encodeURIComponent(fontUrl)}`;
+            await github.rest.repos.createCommitStatus({
+              owner, repo, sha,
+              state: 'success',
+              target_url: previewUrl,
+              description: 'Click to preview the font from this PR',
+              context: 'Font preview',
+            });
